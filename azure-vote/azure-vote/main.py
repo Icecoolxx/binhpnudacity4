@@ -80,7 +80,21 @@ else:
     title = app.config['TITLE']
 
 # Redis Connection to a local server running on the same machine where the current FLask app is running. 
-r = redis.Redis()
+# r = redis.Redis()
+# Redis configurations
+redis_server = os.environ['REDIS']
+
+# Redis Connection to another container
+try:
+   if "REDIS_PWD" in os.environ:
+      r = redis.StrictRedis(host=redis_server,
+                        port=6379,
+                        password=os.environ['REDIS_PWD'])
+   else:
+      r = redis.Redis(redis_server)
+   r.ping()
+except redis.ConnectionError:
+   exit('Failed to connect to Redis, terminating.')
 
 """redis_server = os.environ['REDIS']
 
